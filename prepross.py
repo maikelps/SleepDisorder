@@ -1,10 +1,19 @@
 import pandas as pd
 import numpy as np
 
-def cleaning(df, insomnia_cat = 1) -> pd.DataFrame:
+def cleaned_fr(avoid_systolic = False, insomnia_cat = 1) -> pd.DataFrame:
     """
-    First cleaning pipeline
+    Creates the cleaning pipeline according to the exploration notebook.
+        avoid_systolic -> drops the systolic column generated
+        insomnia_cat -> necessary when needing to separate the type of sleep disorder and give insomnia its own category
     """
+
+    # Reading and fixing column names
+    df = (
+        pd.read_csv('Data/Sleep_health_and_lifestyle_dataset.csv', index_col=[0])
+            .rename( columns=str.lower )
+            .rename( columns=lambda x: x.replace(' ', '_') )
+            )
     
     # Simplifying class
     cast_cat = {
@@ -27,12 +36,7 @@ def cleaning(df, insomnia_cat = 1) -> pd.DataFrame:
                                    'physical_activity_level', 'stress_level'])
                     )
     
-    return full_fr
-
-# Reading and fixing column names
-df = (pd.read_csv('Data/Sleep_health_and_lifestyle_dataset.csv', index_col=[0])
-        .rename( columns=str.lower )
-        .rename( columns=lambda x: x.replace(' ', '_') )
-        )
-
-print( cleaning(df) )
+    if avoid_systolic:
+        full_fr.drop(columns=['systolic_bp'])
+    else:
+        return full_fr
