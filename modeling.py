@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+import joblib
+from sklearn.naive_bayes import GaussianNB
 
 def cleaned_fr(avoid_systolic = False, insomnia_cat = 1) -> pd.DataFrame:
     """
@@ -37,6 +39,28 @@ def cleaned_fr(avoid_systolic = False, insomnia_cat = 1) -> pd.DataFrame:
                     )
     
     if avoid_systolic:
-        full_fr.drop(columns=['systolic_bp'])
+        return full_fr.drop(columns=['systolic_bp'])
     else:
         return full_fr
+
+def train_and_save_model(MODEL_PATH, avoid_systolic = False):
+
+    # 1. Load Data according to the type of model
+    df = cleaned_fr(avoid_systolic = avoid_systolic)
+
+    # Separating
+    X, y = df.iloc[:, :-1], df.iloc[:, -1]
+
+    # 2. Train the Model accordingly
+    if avoid_systolic:
+        print('model not selected')
+    else:
+        model = GaussianNB()
+
+    model.fit(X, y)
+
+    # 3. Serialize the Model
+    joblib.dump(model, MODEL_PATH + '.pkl')
+
+def load_model(MODEL_PATH):
+    return joblib.load(MODEL_PATH)
