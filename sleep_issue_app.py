@@ -57,7 +57,6 @@ with st.sidebar:
     sleep_duration = st.number_input("Enter sleep duration", value=8.0)
     heart_rate = st.number_input("Enter heart rate", value=70, min_value=60)
     daily_steps = st.number_input("Enter daily steps", value=8000)
-    #systolic_bp = st.number_input("Enter systolic BP", value=120)
     is_male = st.selectbox("Select your gender", ["Male", "Female"])
     wf_technical = st.selectbox("Do you work in a technical field? such as: accounting, sofware, engineering, scientist...", ["Yes", "No"])
 
@@ -93,7 +92,6 @@ if st.button("Predict"):
     print(prediction)
 
     st.write(f"### Probability of having a sleep issue:")
-    #st.write(f"## {prediction:.2f}%")
 
     # Creating figure
     fig = plot_filled_gender(is_male, np.round(prediction,2))
@@ -103,4 +101,3 @@ if st.button("Predict"):
     # Show plot in the middle of the app
     with col2:
         st.pyplot(fig, use_container_width=False)
-    

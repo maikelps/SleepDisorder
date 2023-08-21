@@ -45,33 +45,26 @@ def cleaned_fr(avoid_systolic = False, insomnia_cat = 1) -> pd.DataFrame:
     else:
         return full_fr
 
-"""def train_and_save_model(MODEL_PATH, model_selected):
 
-    # 1. Load Data according to the type of model
-    df = cleaned_fr(avoid_systolic = True)
-
-    # Separating
-    X, y = df.iloc[:, :-1], df.iloc[:, -1]
-
-    # Importing pre-process pipeline
-    preprocessor = joblib.load('NoSystolic_preprocessor.pkl')
-
-    # Applying Scaling
-    X_scaled = pd.DataFrame(preprocessor.fit_transform(X), columns=X.columns)
-
-    # Fitting selected model with scaled features
-    model_selected.fit(X_scaled,y)
-
-    # 3. Serialize the Model
-    joblib.dump(model_selected, MODEL_PATH + '.pkl')"""
-
-def train_and_save_model(MODEL_PATH, model_selected):
+def train_and_save_model(MODEL_PATH, model_selected, disorder_pipeline = False):
     """
     Saves the model with scaling features
+        disorder_pipeline -> Controls when is the pipeline created for the model that predicts the type of disorder
     """
+    
+    if disorder_pipeline:
+        # Importing cleaned frame
+        df = cleaned_fr(avoid_systolic=True, insomnia_cat=2)
 
-    # 1. Load Data according to the type of model
-    df = cleaned_fr(avoid_systolic = True)
+        # Fit to -> sleep_apnea=0 vs insomnia=1
+        df = (df
+                .assign(sleep_issue = df.sleep_issue - 1)
+                .query("sleep_issue >= 0")
+                .astype({'sleep_issue' :'uint8'})
+                )
+    else:
+        # 1. Load Data according to the type of model
+        df = cleaned_fr(avoid_systolic = True)
 
     # Separating
     X, y = df.iloc[:, :-1], df.iloc[:, -1]
