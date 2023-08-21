@@ -1,7 +1,9 @@
 import pandas as pd
 import numpy as np
 import joblib
-from sklearn.naive_bayes import GaussianNB
+from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import RobustScaler, FunctionTransformer
 
 def cleaned_fr(avoid_systolic = False, insomnia_cat = 1) -> pd.DataFrame:
     """
@@ -43,19 +45,55 @@ def cleaned_fr(avoid_systolic = False, insomnia_cat = 1) -> pd.DataFrame:
     else:
         return full_fr
 
-def train_and_save_model(MODEL_PATH, model_selected, avoid_systolic = False):
+"""def train_and_save_model(MODEL_PATH, model_selected):
 
     # 1. Load Data according to the type of model
-    df = cleaned_fr(avoid_systolic = avoid_systolic)
+    df = cleaned_fr(avoid_systolic = True)
 
     # Separating
     X, y = df.iloc[:, :-1], df.iloc[:, -1]
 
-    # 2. Train the Model accordingly
-    model_selected.fit(X, y)
+    # Importing pre-process pipeline
+    preprocessor = joblib.load('NoSystolic_preprocessor.pkl')
+
+    # Applying Scaling
+    X_scaled = pd.DataFrame(preprocessor.fit_transform(X), columns=X.columns)
+
+    # Fitting selected model with scaled features
+    model_selected.fit(X_scaled,y)
 
     # 3. Serialize the Model
-    joblib.dump(model_selected, MODEL_PATH + '.pkl')
+    joblib.dump(model_selected, MODEL_PATH + '.pkl')"""
+
+def train_and_save_model(MODEL_PATH, model_selected):
+    """
+    Saves the model with scaling features
+    """
+
+    # 1. Load Data according to the type of model
+    df = cleaned_fr(avoid_systolic = True)
+
+    # Separating
+    X, y = df.iloc[:, :-1], df.iloc[:, -1]
+
+    # Creating Preprocess step
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ('num', RobustScaler(), ['age', 'sleep_duration', 'heart_rate', 'daily_steps']),
+            ('bin', FunctionTransformer(None, validate=False), ['is_male', 'elevated_bmi', 'wf_technical']) # does nothing
+        ])
+
+    # Pipeline for training
+    _model_with_pipeline = Pipeline([
+                                ('preprocessor', preprocessor),
+                                ('model_selected', model_selected)
+                            ])
+
+    # Fitting
+    _model_with_pipeline.fit(X, y)
+
+    # 3. Serialize the Model
+    joblib.dump(_model_with_pipeline, MODEL_PATH + '.pkl')
 
 def load_model(MODEL_PATH):
     return joblib.load(MODEL_PATH)
