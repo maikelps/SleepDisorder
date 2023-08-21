@@ -49,21 +49,22 @@ def plot_filled_gender(male, percentage):
     return fig
 
 # Set title
-st.title("Sleep Issue Predictor.")
+st.title("Sleep Issue Predictor")
 
-# User inputs
-age = st.number_input("Enter your age", value=31, min_value=18, max_value=60)
-sleep_duration = st.number_input("Enter sleep duration", value=8.0)
-heart_rate = st.number_input("Enter heart rate", value=70, min_value=60)
-daily_steps = st.number_input("Enter daily steps", value=8000)
-#systolic_bp = st.number_input("Enter systolic BP", value=120)
-is_male = st.selectbox("Select your gender", ["Male", "Female"])
-wf_technical = st.selectbox("Do you work in a technical field? such as: accounting, sofware, engineering, scientist...", ["Yes", "No"])
+with st.sidebar:
+    # User inputs
+    age = st.number_input("Enter your age", value=31, min_value=18, max_value=60)
+    sleep_duration = st.number_input("Enter sleep duration", value=8.0)
+    heart_rate = st.number_input("Enter heart rate", value=70, min_value=60)
+    daily_steps = st.number_input("Enter daily steps", value=8000)
+    #systolic_bp = st.number_input("Enter systolic BP", value=120)
+    is_male = st.selectbox("Select your gender", ["Male", "Female"])
+    wf_technical = st.selectbox("Do you work in a technical field? such as: accounting, sofware, engineering, scientist...", ["Yes", "No"])
 
-# BMI Calculation
-# elevated_bmi = st.selectbox("Is your BMI elevated?", ["Yes", "No"])
-weight = st.number_input("What's your weight in Kg (kilograms)?", value=70.0)
-height = st.number_input("What's your height in M (meters)?", value=1.60)
+    # BMI Calculation
+    # elevated_bmi = st.selectbox("Is your BMI elevated?", ["Yes", "No"])
+    weight = st.number_input("What's your weight in Kg (kilograms)?", value=70.0)
+    height = st.number_input("What's your height in M (meters)?", value=1.60)
 
 BMI = weight/np.square(height)
 
@@ -91,7 +92,7 @@ if st.button("Predict"):
 
     print(prediction)
 
-    st.write(f"# Probability of having a sleep issue:")
+    st.write(f"### Probability of having a sleep issue:")
     #st.write(f"## {prediction:.2f}%")
 
     # Creating figure
