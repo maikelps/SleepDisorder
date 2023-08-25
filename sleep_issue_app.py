@@ -120,8 +120,10 @@ if st.button("Predict"):
     # Creating figure
     fig = plot_filled_gender(is_male, np.round(issue_prob,2))
 
+    # -------
     # This value will control the layout and will give the user extra information 
-    # on the sleep condition it suffers ussing the logistic model.
+    # on the sleep condition it suffers ussing the logistic model
+    # -------
     cut_off = 50
 
     # Creating column components for the plot
