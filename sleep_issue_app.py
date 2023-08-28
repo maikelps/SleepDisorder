@@ -144,7 +144,7 @@ if st.button("Predict"):
 
             title = f"You may have {issue_prediction}"
 
-            st.pyplot( sleep_issue_image(issue_prediction, title), use_container_width=False)
+            st.pyplot( sleep_issue_image(issue_prediction, title), use_container_width=False )
         
         # Bringing image
         #fig, ax = plt.subplots(figsize=(1,2))
