@@ -2,6 +2,8 @@
 
 The Sleep Issue Predictor app leverages machine learning models to predict the probability of a user having a sleep issue based on their personal data, including age, sleep duration, heart rate, daily steps, gender, weight, height, and whether they work in a technical field. If a user is found likely to have a sleep issue, the app also identifies the type of issue, either "Sleep Apnea" or "Insomnia".
 
+The data used for this app is from [Kaggle](https://www.kaggle.com/datasets/uom190346a/sleep-health-and-lifestyle-dataset?datasetId=3321433).
+
 ## Features:
 
 * Intuitive sidebar for user input.
