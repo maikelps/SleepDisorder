@@ -1,6 +1,7 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
+import time
 from modeling import load_model
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
@@ -73,79 +74,107 @@ def sleep_issue_image(issue, TITLE):
     return fig
 
 # Set title
-st.title("Sleep Issue Predictor")
+st.title("Sleep Issue Predictor💤")
 
-with st.sidebar:
-    # User inputs
-    age = st.number_input("Enter your age", value=31, min_value=18, max_value=60)
-    sleep_duration = st.number_input("Enter sleep duration", value=8.0)
-    heart_rate = st.number_input("Enter heart rate", value=70, min_value=60)
-    daily_steps = st.number_input("Enter daily steps", value=8000)
-    is_male = st.selectbox("Select your gender", ["Male", "Female"])
-    wf_technical = st.selectbox("Do you work in a technical field? such as: accounting, sofware, engineering, scientist...", ["Yes", "No"])
 
-    # BMI Calculation
-    # elevated_bmi = st.selectbox("Is your BMI elevated?", ["Yes", "No"])
-    weight = st.number_input("What's your weight in Kg (kilograms)?", value=70.0)
-    height = st.number_input("What's your height in M (meters)?", value=1.60)
+data_tab, result_tab, instr_tab = st.tabs(["Set readings", "Results", "Instructions"])
 
-BMI = weight/np.square(height)
-
-elevated_bmi = 1 if BMI >= 25 else 0
-# Bounds Reference: https://www.thecalculatorsite.com/articles/health/bmi-formula-for-bmi-calculations.php
-
-# Convert categorical data to numeric
-is_male = 1 if is_male == "Male" else 0
-wf_technical = 1 if wf_technical == "Yes" else 0
-
-# Predict button
-if st.button("Predict"):
-
-    # Getting input data
-    input_data = np.array([[int(age), sleep_duration, heart_rate, int(daily_steps), is_male, elevated_bmi, wf_technical]])
-    
-    # Convert input_data to a DataFrame with appropriate column names
-    columns = ['age', 'sleep_duration', 'heart_rate', 'daily_steps', 'is_male', 'elevated_bmi', 'wf_technical']
-    input_df = pd.DataFrame(input_data, columns=columns)
-
-    print(input_df)
-
-    # Predicting ussing the model that already has scaling implemented in the pipeline
-    issue_prob = proba_predict(issue_model, input_df)*100
-
-    print(issue_prob)
-
-    st.write(f"### Probability of having a sleep issue:")
-
-    # Creating figure
-    fig = plot_filled_gender(is_male, np.round(issue_prob,2))
-
-    # -------
-    # This value will control the layout and will give the user extra information 
-    # on the sleep condition it suffers ussing the logistic model
-    # -------
-    cut_off = 50
+with data_tab:
 
     # Creating column components for the plot
-    col1, col2, col3 = st.columns([.2,.8,.1])
-    # Show plot in the middle of the app
-    with col2:
-        st.pyplot(fig, use_container_width=False)
+    _col1, _col2 = st.columns([.5,.5])
 
-        #sleep_apnea=0 vs insomnia=1
-        issue_prediction = issue_type_model.predict(input_df)[0]
-        print(issue_prediction)
-        print(issue_type_model.predict_proba(input_df))
-
-        issue_prediction = "Sleep Apnea" if (issue_prediction == 1) else "Insomnia"
-
-        if (issue_prob >= cut_off):
-            #st.write(f"It is likely that your sleep issue is {issue_prediction}")
-
-            title = f"You may have {issue_prediction}"
-
-            st.pyplot( sleep_issue_image(issue_prediction, title), use_container_width=False )
+    with _col1:
+        # User inputs
+        age = st.number_input("Enter your age", value=31, min_value=18, max_value=60)
+        sleep_duration = st.number_input("Enter sleep duration", value=8.0)
+        heart_rate = st.number_input("Enter heart rate", value=70, min_value=60)
+        daily_steps = st.number_input("Enter daily steps", value=8000)
+    
+    with _col2:
+        is_male = st.selectbox("Select your gender", ["Male", "Female"])
+        wf_technical = st.selectbox("Do you work in a technical or numeric field?", ["Yes", "No"])#such as: accounting, sofware, engineering, scientist...
         
+        # BMI Calculation
+        # elevated_bmi = st.selectbox("Is your BMI elevated?", ["Yes", "No"])
+        weight = st.number_input("What's your weight in Kg (kilograms)?", value=70.0)
+        height = st.number_input("What's your height in M (meters)?", value=1.60)
+
+
+    BMI = weight/np.square(height)
+
+    elevated_bmi = 1 if BMI >= 25 else 0
+    # Bounds Reference: https://www.thecalculatorsite.com/articles/health/bmi-formula-for-bmi-calculations.php
+
+    # Convert categorical data to numeric
+    is_male = 1 if is_male == "Male" else 0
+    wf_technical = 1 if wf_technical == "Yes" else 0
+
+
+    # Predict button
+    if st.button("Predict"):
+
+        # Getting input data
+        input_data = np.array([[int(age), sleep_duration, heart_rate, int(daily_steps), is_male, elevated_bmi, wf_technical]])
+        
+        # Convert input_data to a DataFrame with appropriate column names
+        columns = ['age', 'sleep_duration', 'heart_rate', 'daily_steps', 'is_male', 'elevated_bmi', 'wf_technical']
+        input_df = pd.DataFrame(input_data, columns=columns)
+
+        print(input_df)
+
+        # Predicting ussing the model that already has scaling implemented in the pipeline
+        issue_prob = proba_predict(issue_model, input_df)*100
+
+        print(issue_prob)
+
+        with result_tab:
+            with st.spinner('Wait for it...'):
+                time.sleep(5)
+                st.write(f"### Probability of having a sleep issue:")
+
+                # Creating figure
+                fig = plot_filled_gender(is_male, np.round(issue_prob,2))
+
+                # -------
+                # This value will control the layout and will give the user extra information 
+                # on the sleep condition it suffers ussing the logistic model
+                # -------
+                cut_off = 50
+
+                # Creating column components for the plot
+                col1, col2, col3 = st.columns([.2,.8,.1])
+                # Show plot in the middle of the app
+                with col2:
+                    st.pyplot(fig, use_container_width=False)
+
+                    #sleep_apnea=0 vs insomnia=1
+                    issue_prediction = issue_type_model.predict(input_df)[0]
+                    print(issue_prediction)
+                    print(issue_type_model.predict_proba(input_df))
+
+                    issue_prediction = "Sleep Apnea" if (issue_prediction == 1) else "Insomnia"
+
+                    if (issue_prob >= cut_off):
+                        #st.write(f"It is likely that your sleep issue is {issue_prediction}")
+
+                        title = f"You may have {issue_prediction}"
+
+                        st.pyplot( sleep_issue_image(issue_prediction, title), use_container_width=False )
+        
+    else:
+        with result_tab:
+            st.markdown('Set your readings in the "Set readings" tab and hit predict to get your prediction')
+
+with instr_tab:
+    st.markdown("""
+                Set your readings in the "Set readings" tab, click the predict button and you'll see your result in the "Results" tab.
+                
+                Your personal data won't be saved or used for any purpose, this is app is purely recreational.
+
+                The predictions are obtained by means of a Machine Learning algorithm trained using publicly available data at [Kaggle](https://www.kaggle.com/datasets/uom190346a/sleep-health-and-lifestyle-dataset?datasetId=3321433).
+
+                """)
         # Bringing image
         #fig, ax = plt.subplots(figsize=(1,2))
         #ax.imshow(grayscale_img_with_alpha, interpolation='none')
